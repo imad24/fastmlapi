@@ -1,0 +1,40 @@
+resources:
+  - repo: self
+    clean: true
+phases:
+  - phase: Phase_1
+    displayName: Docker Image Build
+    queue:
+      name: CI-linux-build-agents
+    steps:
+      - task: Docker@1
+        displayName: 'Build Python Prod 3.7.6 Docker Image'
+        inputs:
+          containerregistrytype: 'Container Registry'
+
+          dockerRegistryEndpoint: $(DockerRegistry)
+
+          dockerFile: '{{cookiecutter.project_name}}/dockerFile'
+
+          useDefaultContext: true
+
+          addDefaultLabels: false
+
+          imageName: $(DockerRegistry)/python-fastApi:1.0.0
+          
+          restartPolicy: always
+
+        enabled: true
+
+      - task: Docker@1
+        displayName: 'Push the image'
+        inputs:
+          containerregistrytype: 'Container Registry'
+
+          dockerRegistryEndpoint: $(DockerRegistry)
+
+          command: 'Push an image'
+
+          imageName: $(DockerRegistry)/python-fastApi:1.0.0
+
+        enabled: true

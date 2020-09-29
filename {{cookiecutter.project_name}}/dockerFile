@@ -1,0 +1,9 @@
+FROM python:3.7.6
+#Prepare the working directory and env variables
+WORKDIR /work
+
+ADD requirements.txt work/requirements.txt
+
+#install the pip requirements
+RUN python -m pip install --upgrade pip
+RUN python -m pip install -r work/requirements.txt
