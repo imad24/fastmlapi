@@ -14,13 +14,13 @@ phases:
 
           dockerRegistryEndpoint: $(DockerRegistry)
 
-          dockerFile: '{{cookiecutter.project_name}}/dockerFile'
+          dockerFile: 'dockerFile'
 
           useDefaultContext: true
 
           addDefaultLabels: false
 
-          imageName: $(DockerRegistry)/python-fastApi:1.0.0
+          imageName: $(DockerRegistry)/fastMLApi:1.0.0
           
           restartPolicy: always
 
@@ -35,6 +35,6 @@ phases:
 
           command: 'Push an image'
 
-          imageName: $(DockerRegistry)/python-fastApi:1.0.0
+          imageName: $(DockerRegistry)/fastMLApi:1.0.0
 
         enabled: true

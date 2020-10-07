@@ -1,9 +1,34 @@
-FROM python:3.7.6
+FROM fastmlapi:1.0.0
+
 #Prepare the working directory and env variables
-WORKDIR /work
+WORKDIR /{{cookiecutter.package_name}}
+ENV APPPATH /{{cookiecutter.package_name}}
 
-ADD requirements.txt work/requirements.txt
+#for tests
+ADD {{cookiecutter.package_name}}/tests tests/
 
-#install the pip requirements
-RUN python -m pip install --upgrade pip
-RUN python -m pip install -r work/requirements.txt
+#Copy webApi and other files
+ADD webApi webApi/
+ADD config.json config.json
+ADD requirements.txt requirements.txt
+
+#configure webApp server
+ENV SERVER "0.0.0.0"
+ENV PORT 8000
+ENV CONTAINER_PORT 8000
+ENV APPNAME {{cookiecutter.package_name}}
+
+#install required packages
+RUN python3 -m pip install -r requirements.txt
+
+#install the current package
+COPY dist/{{cookiecutter.package_name}}-0.1.0.tar.gz {{cookiecutter.package_name}}.tar.gz
+RUN python3 -m pip install {{cookiecutter.package_name}}.tar.gz
+
+#set the web server as entry point
+WORKDIR /{{cookiecutter.package_name}}/webApi
+ADD start.sh start.sh 
+ENTRYPOINT ["sh" ,"./start.sh"]
+
+EXPOSE ${CONTAINER_PORT}
+

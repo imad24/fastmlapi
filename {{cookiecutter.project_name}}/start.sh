@@ -1,0 +1,1 @@
+uvicorn --port ${PORT} --host ${SERVER} main:app

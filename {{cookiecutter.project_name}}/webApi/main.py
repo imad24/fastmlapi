@@ -6,7 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Path, Query
 from fastapi.responses import JSONResponse, Response
 from fastapi.encoders import jsonable_encoder
 
