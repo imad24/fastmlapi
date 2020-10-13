@@ -11,10 +11,10 @@ from fastapi import FastAPI, Request, HTTPException, Path, Query
 from fastapi.responses import JSONResponse, Response
 from fastapi.encoders import jsonable_encoder
 
-from configuration.version import __version__
-from controllers.ErrorHandler import ErrorHandler
+from .configuration.version import __version__
+from .controllers.errors import ErrorHandler
 
-from models.examples import ExampleObject, tags_metadata
+from .models.examples import ExampleObject, tags_metadata
 
 from starlette_prometheus import metrics, PrometheusMiddleware
 

@@ -26,9 +26,5 @@ COPY dist/{{cookiecutter.package_name}}-0.1.0.tar.gz {{cookiecutter.package_name
 RUN python3 -m pip install {{cookiecutter.package_name}}.tar.gz
 
 #set the web server as entry point
-WORKDIR /{{cookiecutter.package_name}}/webApi
-ADD start.sh start.sh 
-ENTRYPOINT ["sh" ,"./start.sh"]
-
-EXPOSE ${CONTAINER_PORT}
+ENTRYPOINT [ "uvicorn", "webApi.main:app" ]
 
