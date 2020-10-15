@@ -14,7 +14,7 @@ from fastapi.encoders import jsonable_encoder
 from .configuration.version import __version__
 from .controllers.errors import ErrorHandler
 
-from .models.examples import ExampleObject, tags_metadata
+from .models.examples import ExampleObject, tags_metadata, BaseModel
 
 from starlette_prometheus import metrics, PrometheusMiddleware
 
@@ -25,8 +25,30 @@ app.add_middleware(PrometheusMiddleware)
 app.add_route("/metrics/", metrics)
 
 
+
+class Item(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    tax: Optional[float] = None
+
+
+@app.put("/items/{item_id}")
+async def update_item(
+    *,
+    item_id: int = Path(..., title="The ID of the item to get", ge=0, le=1000),
+    q: Optional[str] = None,
+    item: Optional[Item] = None,
+):
+    results = {"item_id": item_id}
+    if q:
+        results.update({"q": q})
+    if item:
+        results.update({"item": item})
+    return results
+
 @app.get("/items/")
-async def read_items(
+def read_items(
     q: Optional[str] = Query(
         None,
         title="Query string",
@@ -48,11 +70,6 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/items/{item_id}")
-async def read_item(item_id: int):
-    return {"item_id": item_id}
-
-
 @app.post("/request", tags=["exampleTag"])
 def exampleRequest(request: ExampleObject):
     # from package_name.configuration.settings
@@ -66,6 +83,22 @@ def exampleRequest(request: ExampleObject):
         customField : request.customField
     except Exception as ex:
         raise HTTPException(detail=f'Error while parsing request: {ex}', status_code=400) 
+
+
+
+class UnicornException(Exception):
+    def __init__(self, name: str):
+        self.name = name
+
+
+@app.exception_handler(UnicornException)
+async def unicorn_exception_handler(request: Request, exc: UnicornException):
+    return JSONResponse(
+        status_code=418,
+        content={"message": f"Oops! {exc.name} did something. There goes a rainbow..."},
+    )
+
+
 
 
 # Register error handling so we can manage easily functional errors

@@ -1,7 +1,9 @@
 from typing import Optional, List, Dict
+from uuid import UUID
 from pydantic import BaseModel, Field
 from datetime import datetime
 from enum import Enum
+
 
 
 tags_metadata = [
@@ -24,6 +26,7 @@ class LogLevel(str, Enum):
     CRITICAL = "CRITICAL"
 
 class ExampleObject(BaseModel):
+    id: UUID
     attribute: str
     optinalAttribute: Optional[int]
     complexAttribute: Optional[List[Dict]]
@@ -32,14 +35,6 @@ class ExampleObject(BaseModel):
         5,
         title="",
         description="",
-        gt = 3
+        gt = 3,
+        example=55
     )
-
-
-class ServerStatus(BaseModel):
-    Status: str
-    PackageVersion : str
-    LogLevel: LogLevel
-    Health: Optional[str] = None
-    CallsCount: Optional[int] = None
-    FailsCount: Optional[int] = None
