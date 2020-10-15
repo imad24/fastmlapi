@@ -14,7 +14,7 @@ from fastapi.encoders import jsonable_encoder
 from .configuration.version import __version__
 from .controllers.errors import ErrorHandler
 
-from .models.examples import ExampleObject, tags_metadata, BaseModel
+from .models.examples import ExampleObject, ForecastRequestModel, tags_metadata, BaseModel
 
 from starlette_prometheus import metrics, PrometheusMiddleware
 
@@ -25,6 +25,13 @@ app.add_middleware(PrometheusMiddleware)
 app.add_route("/metrics/", metrics)
 
 
+
+
+
+@app.post('/forecast/')
+def forecast(forecastRequestModel: ForecastRequestModel):
+    return forecastRequestModel
+    
 
 class Item(BaseModel):
     name: str

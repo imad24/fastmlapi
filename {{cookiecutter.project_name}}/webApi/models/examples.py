@@ -1,21 +1,41 @@
 from typing import Optional, List, Dict
 from uuid import UUID
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import datetime, time, timedelta
 from enum import Enum
 
 
 
 tags_metadata = [
     {
-        "name": "exampleTag",
-        "description": "Used as an example of tag using in docs",
-    },
-    {
-        "name" : "serverStatus",
-        "description" : "Gives Status and Health information about the running server"
+        "name": "Forecast Request",
+        "description": "Forecast body request that must be sent to demandsensing API",
     }
 ]
+
+
+
+class ForecastRequestModel(BaseModel):
+	model : str
+	horizonDate : datetime
+	hyperParams : Dict
+	values : List[str]
+	dateStart : datetime
+	dateEnd : datetime
+	dateFormat : Optional[str]
+	chrono : str
+	confidenceInterval : Optional[float] = Field(
+        0,
+        title="Confidence Interval",
+        description="Percentage of confidence interval to be taken into account when calculating the forecast",
+        ge=0,
+        lt=1
+    )
+	externalVariables : Optional[List[List]] = None
+	firstDayOfWeek : Optional[str] = "Monday"
+	metrics : List[str]
+	seasonality : Optional[List[str]]
+
 
 #example of Enum use
 class LogLevel(str, Enum):
