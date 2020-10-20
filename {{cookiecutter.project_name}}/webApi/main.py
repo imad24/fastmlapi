@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse, Response
 from starlette_prometheus import PrometheusMiddleware, metrics
 
 from .configuration.version import __version__
-from .controllers.errors import ErrorHandler
+from .controllers.exceptions import InnerException
 from .models.examples import ExampleObject, tags_metadata
 
 app = FastAPI(openapi_tags=tags_metadata, version=__version__)
