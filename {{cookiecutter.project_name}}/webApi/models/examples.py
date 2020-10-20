@@ -8,8 +8,8 @@ from enum import Enum
 
 tags_metadata = [
     {
-        "name": "Forecast Request",
-        "description": "Forecast body request that must be sent to demandsensing API",
+        "name": "Forecasts",
+        "description": "Operations that calculate the forecasts",
     }
 ]
 

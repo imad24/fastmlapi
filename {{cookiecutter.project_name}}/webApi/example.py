@@ -8,11 +8,12 @@ load_dotenv(find_dotenv())
 from typing import Optional, List, Dict
 
 from fastapi import FastAPI, Request, HTTPException, Path, Query
-from fastapi.responses import JSONResponse, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.encoders import jsonable_encoder
 
 from .configuration.version import __version__
-from .controllers.errors import ErrorHandler
+from .controllers.exceptions import InnerException
 
 from .models.examples import ExampleObject, ForecastRequestModel, tags_metadata, BaseModel
 
@@ -28,10 +29,18 @@ app.add_route("/metrics/", metrics)
 
 
 
-@app.post('/forecast/')
+
+@app.post('/forecast/'
+        ,tags=["Forecasts"]
+        ,summary="Calculates the forecast of a given series"
+        ,response_description="The calculated forecast"
+        ,response_model=ForecastRequestModel)
 def forecast(forecastRequestModel: ForecastRequestModel):
+    """Calculates the forecast from the series in the body of the request
+    """
     return forecastRequestModel
     
+
 
 class Item(BaseModel):
     name: str
@@ -40,7 +49,7 @@ class Item(BaseModel):
     tax: Optional[float] = None
 
 
-@app.put("/items/{item_id}")
+@app.put("/items/{item_id}", tags=["Examples"])
 async def update_item(
     *,
     item_id: int = Path(..., title="The ID of the item to get", ge=0, le=1000),
@@ -54,7 +63,7 @@ async def update_item(
         results.update({"item": item})
     return results
 
-@app.get("/items/")
+@app.get("/items/", tags=["Examples"])
 def read_items(
     q: Optional[str] = Query(
         None,
@@ -72,12 +81,30 @@ def read_items(
     return results
 
 
+def train():
+    try:
+        # do some work here and then something happens
+        raise ValueError("The requested model ID couldn't be found !")
+    except Exception as exc:
+        raise InnerException(error="Could not load model", message=str(exc), loc=__name__)
+
+@app.get("/items/{item_id}", tags=["Examples"],
+summary="Example of exception handling")
+async def read_item(item_id: int):
+    try:    
+        train()
+    except InnerException as innerExc:
+        raise HTTPException(status_code=500, detail=innerExc.json())
+    return {"item_id": item_id}
+
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
 
-@app.post("/request", tags=["exampleTag"])
+@app.post("/request", tags=["Examples"])
 def exampleRequest(request: ExampleObject):
     # from package_name.configuration.settings
     # logger = settings.get_logger(__name__)
@@ -89,28 +116,4 @@ def exampleRequest(request: ExampleObject):
         dateAttribute: request.dateAttribute
         customField : request.customField
     except Exception as ex:
-        raise HTTPException(detail=f'Error while parsing request: {ex}', status_code=400) 
-
-
-
-class UnicornException(Exception):
-    def __init__(self, name: str):
-        self.name = name
-
-
-@app.exception_handler(UnicornException)
-async def unicorn_exception_handler(request: Request, exc: UnicornException):
-    return JSONResponse(
-        status_code=418,
-        content={"message": f"Oops! {exc.name} did something. There goes a rainbow..."},
-    )
-
-
-
-
-# Register error handling so we can manage easily functional errors
-@app.exception_handler(ErrorHandler)
-def handle_invalid_usage(request: Request, error: ErrorHandler):
-  response = JSONResponse(error.to_dict())
-  response.status_code = error.status_code
-  return response
+        raise HTTPException(detail=f'Error while parsing request: {ex}', status_code=400)
