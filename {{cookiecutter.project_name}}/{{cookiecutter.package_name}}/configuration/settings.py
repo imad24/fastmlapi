@@ -31,20 +31,11 @@ def init():
         global options
 
         app_dir = os.path.normpath(os.getenv("APPPATH"))
-        source_directory = os.path.normpath(os.getenv("SOURCEDIR"))
-
         globalConfigFile = os.path.join(app_dir,'config.json')
-        userConfigFile = os.path.join(source_directory,'config.json')
 
-        # load global settings from config file
-        cfg_file = globalConfigFile
-
-        #set user config file
-        if os.path.isfile(userConfigFile): 
-                cfg_file = userConfigFile 
-
-        with open(cfg_file) as cfg:
+        with open(globalConfigFile, mode="r", encoding="utf-8") as cfg:
                 options = json.load(cfg)
+
 
         if "log_level" in options:
                 _set_logging_level(options["log_level"])
@@ -97,15 +88,6 @@ def load_json_file(filename):
                 return data     
 
 
-def set_user_config_file(filepath):
-	global options
-	userConfigFile = filepath
-	if os.path.isfile(userConfigFile): 
-		cfg_file = userConfigFile 
-	with open(cfg_file) as cfg:
-                options = json.load(cfg)
-	if "log_level" in options:
-                _set_logging_level(options["log_level"])
     
 def _set_logging_level(verbose):
         global logging_level
