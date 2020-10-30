@@ -25,6 +25,7 @@ numpy==1.18.1
 pandas==1.0.2
 patsy==0.5.1
 prometheus-client==0.7.1
+pyentrp==0.5.0
 pydantic==1.6.1
 pyjwt==1.7.1
 pyparsing==2.4.6

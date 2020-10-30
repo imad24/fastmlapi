@@ -12,8 +12,13 @@ from starlette_prometheus import PrometheusMiddleware, metrics
 
 from .configuration.version import __version__
 from .controllers.exceptions import InnerException
-from .models.examples import ExampleObject, tags_metadata
 
+tags_metadata = [
+    {
+        "name": "Main App",
+        "description": "Main application template",
+    }
+]
 app = FastAPI(openapi_tags=tags_metadata, version=__version__)
 app.add_middleware(PrometheusMiddleware)
 app.add_route("/metrics/", metrics)
